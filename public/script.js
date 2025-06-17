@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterButtons = document.querySelectorAll('.filter-btn');
     
     // API URL - thay bằng URL thực tế của bạn
-    const API_URL = 'https://serverlessdemo-ks1oh9jeu-serverlesssdemo.vercel.app//api/products';
+    const API_URL = 'https://serverlessdemo-ks1oh9jeu-serverlesssdemo.vercel.app/api/products';
     
     // Hiển thị sản phẩm
     async function fetchProducts(searchTerm = '', category = 'all') {
