@@ -1,75 +1,57 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const productsContainer = document.getElementById('products-container');
-    const searchInput = document.getElementById('search-input');
-    const searchBtn = document.getElementById('search-btn');
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    
-    // API URL - thay bằng URL thực tế của bạn
     const API_URL = 'https://serverlessdemo-git-main-serverlessdemo.vercel.app/api/products';
-    
-    // Hiển thị sản phẩm
-    async function fetchProducts(searchTerm = '', category = 'all') {
+    console.log('Đang kết nối tới:', API_URL);
+  
+    async function loadProducts() {
       try {
-        let url = API_URL;
+        const response = await fetch(API_URL);
         
-        if (searchTerm) {
-          url = `${API_URL}/search/${searchTerm}`;
+        if (!response.ok) {
+          throw new Error(`Lỗi HTTP: ${response.status}`);
         }
         
-        const response = await fetch(url);
-        let products = await response.json();
+        const products = await response.json();
         
-        // Lọc theo danh mục
-        if (category !== 'all') {
-          products = products.filter(product => product.category === category);
+        if (!products || !Array.isArray(products)) {
+          throw new Error('Dữ liệu không hợp lệ');
         }
         
         displayProducts(products);
       } catch (error) {
-        console.error('Lỗi khi tải sản phẩm:', error);
-        productsContainer.innerHTML = '<p class="error">Không thể tải danh sách đồ uống. Vui lòng thử lại sau.</p>';
+        console.error('Lỗi tải dữ liệu:', error);
+        document.getElementById('products-container').innerHTML = `
+          <div class="error-message">
+            <p>Không thể tải menu. Vui lòng thử lại sau</p>
+            <button onclick="window.location.reload()">Tải lại</button>
+            <small>${error.message}</small>
+          </div>
+        `;
       }
     }
-    
-    // Hiển thị sản phẩm lên grid
+  
     function displayProducts(products) {
-      if (products.length === 0) {
-        productsContainer.innerHTML = '<p class="no-results">Không tìm thấy đồ uống phù hợp.</p>';
-        return;
-      }
-      
-      productsContainer.innerHTML = products.map(product => `
+      const container = document.getElementById('products-container');
+      container.innerHTML = products.map(product => `
         <div class="product-card">
-          <div class="product-image">
-            <i class="fas fa-coffee"></i>
+          <div class="product-icon">
+            ${getIconByCategory(product.category)}
           </div>
-          <div class="product-info">
-            <h3>${product.name}</h3>
-            <p>${product.description}</p>
-            <div class="product-price">${product.price.toLocaleString()} VND</div>
-          </div>
+          <h3>${product.name}</h3>
+          <p>${product.description}</p>
+          <div class="price">${product.price.toLocaleString('vi-VN')}₫</div>
         </div>
       `).join('');
     }
-    
-    // Xử lý tìm kiếm
-    searchBtn.addEventListener('click', () => {
-      const searchTerm = searchInput.value.trim();
-      const activeCategory = document.querySelector('.filter-btn.active').dataset.category;
-      fetchProducts(searchTerm, activeCategory);
-    });
-    
-    // Xử lý bộ lọc
-    filterButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        filterButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-        const category = button.dataset.category;
-        const searchTerm = searchInput.value.trim();
-        fetchProducts(searchTerm, category);
-      });
-    });
-    
-    // Tải sản phẩm ban đầu
-    fetchProducts();
+  
+    function getIconByCategory(category) {
+      const icons = {
+        'Cà phê': 'fa-coffee',
+        'Nước ép': 'fa-glass-water',
+        'Đặc biệt': 'fa-star'
+      };
+      return `<i class="fas ${icons[category] || 'fa-mug-hot'}"></i>`;
+    }
+  
+    // Khởi chạy
+    loadProducts();
   });
