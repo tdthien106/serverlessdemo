@@ -10,6 +10,13 @@ app.use(express.json());
 // Routes
 app.use('/api/products', productsRouter);
 
+// Thêm header CORS
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    next();
+  });
+
 // Health check
 app.get('/api', (req, res) => {
   res.json({ message: 'API Đồ uống đang hoạt động!' });

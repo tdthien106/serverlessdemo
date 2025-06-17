@@ -4,72 +4,54 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchBtn = document.getElementById('search-btn');
     const filterButtons = document.querySelectorAll('.filter-btn');
     
-
+    // API URL - kiểm tra kỹ URL của bạn
     const API_URL = 'https://serverlessdemo-6nwvpqayy-serverlesssdemo.vercel.app/api/products';
     
-    // Hiển thị sản phẩm
+    console.log('Đang kết nối tới API:', API_URL); // Debug
+  
     async function fetchProducts(searchTerm = '', category = 'all') {
       try {
         let url = API_URL;
         
         if (searchTerm) {
-          url = `${API_URL}/search/${searchTerm}`;
+          url = `${API_URL}/search/${encodeURIComponent(searchTerm)}`;
         }
         
-        const response = await fetch(url);
-        let products = await response.json();
+        const response = await fetch(url, {
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
         
-        // Lọc theo danh mục
-        if (category !== 'all') {
-          products = products.filter(product => product.category === category);
+        console.log('API Response:', response); // Debug
+        
+        if (!response.ok) {
+          throw new Error(`Lỗi HTTP: ${response.status}`);
         }
         
-        displayProducts(products);
+        const products = await response.json();
+        console.log('Dữ liệu nhận được:', products); // Debug
+        
+        if (!Array.isArray(products)) {
+          throw new Error('Dữ liệu không hợp lệ');
+        }
+        
+        displayProducts(
+          category === 'all' 
+            ? products 
+            : products.filter(p => p.category === category)
+        );
       } catch (error) {
-        console.error('Lỗi khi tải sản phẩm:', error);
-        productsContainer.innerHTML = '<p class="error">Không thể tải danh sách đồ uống. Vui lòng thử lại sau.</p>';
+        console.error('Chi tiết lỗi:', error);
+        productsContainer.innerHTML = `
+          <p class="error">
+            Không thể tải danh sách đồ uống. 
+            <button onclick="location.reload()">Thử lại</button>
+            <br><small>${error.message}</small>
+          </p>
+        `;
       }
     }
-    
-    // Hiển thị sản phẩm lên grid
-    function displayProducts(products) {
-      if (products.length === 0) {
-        productsContainer.innerHTML = '<p class="no-results">Không tìm thấy đồ uống phù hợp.</p>';
-        return;
-      }
-      
-      productsContainer.innerHTML = products.map(product => `
-        <div class="product-card">
-          <div class="product-image">
-            <i class="fas fa-coffee"></i>
-          </div>
-          <div class="product-info">
-            <h3>${product.name}</h3>
-            <p>${product.description}</p>
-            <div class="product-price">${product.price.toLocaleString()} VND</div>
-          </div>
-        </div>
-      `).join('');
-    }
-    
-    // Xử lý tìm kiếm
-    searchBtn.addEventListener('click', () => {
-      const searchTerm = searchInput.value.trim();
-      const activeCategory = document.querySelector('.filter-btn.active').dataset.category;
-      fetchProducts(searchTerm, activeCategory);
-    });
-    
-    // Xử lý bộ lọc
-    filterButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        filterButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-        const category = button.dataset.category;
-        const searchTerm = searchInput.value.trim();
-        fetchProducts(searchTerm, category);
-      });
-    });
-    
-    // Tải sản phẩm ban đầu
-    fetchProducts();
+  
+    // ... (phần displayProducts và các hàm khác giữ nguyên)
   });
