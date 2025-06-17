@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchBtn = document.getElementById('search-btn');
     const filterButtons = document.querySelectorAll('.filter-btn');
     
-    // API URL - thay bằng URL thực tế của bạn
     const API_URL = 'https://serverlessdemo-nine.vercel.app/api/products';
     
     // Hiển thị sản phẩm
@@ -64,4 +63,12 @@ document.addEventListener('DOMContentLoaded', () => {
       button.addEventListener('click', () => {
         filterButtons.forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
-        const category = button.dataset
+        const category = button.dataset.category;
+        const searchTerm = searchInput.value.trim();
+        fetchProducts(searchTerm, category);
+      });
+    });
+    
+    // Tải sản phẩm ban đầu
+    fetchProducts();
+  });
