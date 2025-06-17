@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterButtons = document.querySelectorAll('.filter-btn');
     
     // API URL - kiểm tra kỹ URL của bạn
-    const API_URL = 'https://serverlessdemo-6nwvpqayy-serverlesssdemo.vercel.app/api/products';
+    const API_URL = 'https://serverlessdemo-nine.vercel.app/api/products';
     
     console.log('Đang kết nối tới API:', API_URL); // Debug
   
