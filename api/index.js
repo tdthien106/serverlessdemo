@@ -10,10 +10,20 @@ app.use(express.json());
 // Routes
 app.use('/api/products', productsRouter);
 
-// Thêm header CORS
+// Middleware CORS chi tiết
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    const allowedOrigins = [
+      'https://serverlessdemo-f030kswf3-serverlesssdemo.vercel.app',
+      'https://serverlessdemo-git-main-serverlesssdemo.vercel.app'
+    ];
+    const origin = req.headers.origin;
+    
+    if (allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    
+    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
     next();
   });
 
